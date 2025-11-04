@@ -22,12 +22,14 @@ LOG_MODULE_REGISTER(sedi_dma, CONFIG_DMA_LOG_LEVEL);
 extern void dma_isr(sedi_dma_t dma_device);
 
 struct dma_sedi_config_info {
+	DEVICE_MMIO_ROM;
 	sedi_dma_t peripheral_id; /* Controller instance. */
 	uint8_t chn_num;
 	void (*irq_config)(void);
 };
 
 struct dma_sedi_driver_data {
+	DEVICE_MMIO_RAM;
 	struct dma_config dma_configs[DMA_CHANNEL_NUM];
 };
 
@@ -358,6 +360,9 @@ static int dma_sedi_init(const struct device *dev)
 {
 	const struct dma_sedi_config_info *const config = DEV_CFG(dev);
 
+	DEVICE_MMIO_MAP(dev, K_MEM_CACHE_NONE);
+	sedi_dma_init(config->peripheral_id, DEVICE_MMIO_GET(dev));
+
 	config->irq_config();
 
 	return 0;
@@ -368,6 +373,7 @@ static int dma_sedi_init(const struct device *dev)
 									\
 	static struct dma_sedi_driver_data dma_sedi_dev_data_##inst; \
 	static const struct dma_sedi_config_info dma_sedi_config_data_##inst = { \
+		DEVICE_MMIO_ROM_INIT(DT_DRV_INST(inst)), \
 		.peripheral_id = DT_INST_PROP(inst, peripheral_id), \
 		.chn_num = DT_INST_PROP(inst, dma_channels), \
 		.irq_config = dma_sedi_##inst##_irq_config \
