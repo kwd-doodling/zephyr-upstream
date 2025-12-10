@@ -11,9 +11,17 @@
 #include <zephyr/drivers/gpio/gpio_utils.h>
 #include <zephyr/pm/device.h>
 
+/* Required by DEVICE_MMIO_NAMED_* macros */
+#define DEV_CFG(_dev) \
+	((const struct gpio_sedi_config *)(_dev)->config)
+#define DEV_DATA(_dev) ((struct gpio_sedi_data *)(_dev)->data)
+
 struct gpio_sedi_config {
 	/* gpio_driver_data needs to be first */
 	struct gpio_driver_config common;
+
+	DEVICE_MMIO_NAMED_ROM(reg_base);
+
 	sedi_gpio_t device;
 	uint32_t pin_nums;
 	void (*irq_config)(void);
@@ -22,6 +30,9 @@ struct gpio_sedi_config {
 struct gpio_sedi_data {
 	/* gpio_driver_data needs to be first */
 	struct gpio_driver_config common;
+
+	DEVICE_MMIO_NAMED_RAM(reg_base);
+
 	sys_slist_t callbacks;
 };
 
@@ -290,14 +301,12 @@ static int gpio_sedi_init(const struct device *dev)
 	sedi_gpio_t gpio_dev = config->device;
 
 	sedi_gpio_set_power(gpio_dev, SEDI_POWER_FULL);
+	DEVICE_MMIO_NAMED_MAP(dev, reg_base, K_MEM_CACHE_NONE);
 
-	/* Call sedi gpio init */
 	ret = sedi_gpio_init(gpio_dev, gpio_sedi_callback, (void *)dev);
-
 	if (ret != 0) {
-		return ret;
+		return -ENXIO;
 	}
-	sedi_gpio_set_power(gpio_dev, SEDI_POWER_FULL);
 
 	config->irq_config();
 
@@ -320,6 +329,7 @@ static int gpio_sedi_init(const struct device *dev)
 	};							       \
 	static const struct gpio_sedi_config gpio##n##_config = {      \
 		.common = { 0xFFFFFFFF },			       \
+		DEVICE_MMIO_NAMED_ROM_INIT(reg_base, DT_DRV_INST(n)),  \
 		.device = DT_INST_PROP(n, peripheral_id),              \
 		.pin_nums = DT_INST_PROP(n, ngpios),                   \
 		.irq_config = gpio_sedi_irq_config_##n,	               \
