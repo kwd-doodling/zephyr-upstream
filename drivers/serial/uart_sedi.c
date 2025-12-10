@@ -624,7 +624,7 @@ static int uart_sedi_init(const struct device *dev)
 	sedi_uart_config_t cfg;
 
 	DEVICE_MMIO_MAP(dev, K_MEM_CACHE_NONE);
-	sedi_uart_init(config->instance, (void *)DEVICE_MMIO_GET(dev));
+	sedi_uart_init(config->instance, DEVICE_MMIO_GET(dev));
 
 	cfg.line_control = config->line_ctrl;
 	cfg.baud_rate = config->baud_rate;
