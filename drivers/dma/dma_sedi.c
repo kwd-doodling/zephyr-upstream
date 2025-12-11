@@ -256,7 +256,7 @@ static int dma_sedi_chan_config(const struct device *dev, uint32_t channel,
 	/* initialize the dma controller, following the sedi api*/
 	sedi_dma_event_cb_t cb = dma_handler;
 
-	sedi_dma_init(info->peripheral_id, (int)channel, cb, (void *)dev);
+	sedi_dma_chan_init(info->peripheral_id, (int)channel, cb, (void *)dev);
 
 	return 0;
 
