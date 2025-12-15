@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2023 Intel Corporation
+ * Copyright (c) 2020-2025 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -27,12 +27,16 @@ extern "C" {
 #define IPM_TIMEOUT_MS 1000
 
 struct ipm_sedi_config_t {
+	DEVICE_MMIO_ROM;
+
 	sedi_ipc_t ipc_device;
 	int32_t irq_num;
 	void (*irq_config)(void);
 };
 
 struct ipm_sedi_context {
+	DEVICE_MMIO_RAM;
+
 	ipm_callback_t rx_msg_notify_cb;
 	void *rx_msg_notify_cb_data;
 	uint8_t incoming_data_buf[IPC_DATA_LEN_MAX];

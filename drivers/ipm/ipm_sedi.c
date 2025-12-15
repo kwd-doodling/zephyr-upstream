@@ -86,7 +86,9 @@ static int ipm_init(const struct device *dev)
 	k_mutex_init(&ipm->device_write_lock);
 	ipm->status = 0;
 
-	sedi_ipc_init(device, ipm_event_dispose, (void *)dev);
+	DEVICE_MMIO_MAP(dev, K_MEM_CACHE_NONE);
+
+	sedi_ipc_init(device, ipm_event_dispose, (void *)dev, DEVICE_MMIO_GET(dev));
 	atomic_set_bit(&ipm->status, IPM_PEER_READY_BIT);
 	LOG_DBG("ipm driver initialized on device: %p", dev);
 	return 0;
@@ -273,6 +275,7 @@ static DEVICE_API(ipm, ipm_funcs) = {
 	static struct ipm_sedi_context ipm_data_##n;			\
 	static void ipm_##n##_irq_config(void);				\
 	static const struct ipm_sedi_config_t ipm_config_##n = {	\
+		DEVICE_MMIO_ROM_INIT(DT_DRV_INST(n)),			\
 		.ipc_device = DT_INST_PROP(n, peripheral_id),		\
 		.irq_num = DT_INST_IRQN(n),				\
 		.irq_config = ipm_##n##_irq_config,			\
