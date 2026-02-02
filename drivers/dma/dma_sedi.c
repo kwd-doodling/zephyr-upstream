@@ -7,18 +7,14 @@
 #define DT_DRV_COMPAT intel_sedi_dma
 
 #include <errno.h>
-#include <stdio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/pm/device.h>
-#include <string.h>
-#include <zephyr/init.h>
+#include <zephyr/pm/device_runtime.h>
 #include <zephyr/drivers/dma.h>
 #include <zephyr/devicetree.h>
-#include <zephyr/cache.h>
 #include <soc.h>
 
 #include "sedi_driver_dma.h"
-#include "sedi_driver_core.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sedi_dma, CONFIG_DMA_LOG_LEVEL);
