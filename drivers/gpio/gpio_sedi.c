@@ -303,9 +303,14 @@ static int gpio_sedi_init(const struct device *dev)
 	sedi_gpio_set_power(gpio_dev, SEDI_POWER_FULL);
 	DEVICE_MMIO_NAMED_MAP(dev, reg_base, K_MEM_CACHE_NONE);
 
-	ret = sedi_gpio_init(gpio_dev, gpio_sedi_callback, (void *)dev);
+	ret = sedi_gpio_init(gpio_dev, DEVICE_MMIO_NAMED_GET(dev, reg_base));
 	if (ret != 0) {
 		return -ENXIO;
+	}
+
+	ret = sedi_gpio_register_callback(gpio_dev, 0, UINT32_MAX, gpio_sedi_callback, (void *)dev);
+	if (ret != 0) {
+		return -EBUSY;
 	}
 
 	config->irq_config();
