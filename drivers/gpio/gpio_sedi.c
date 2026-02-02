@@ -17,16 +17,12 @@ struct gpio_sedi_config {
 	sedi_gpio_t device;
 	uint32_t pin_nums;
 	void (*irq_config)(void);
-
-	DEVICE_MMIO_ROM;
 };
 
 struct gpio_sedi_data {
 	/* gpio_driver_data needs to be first */
 	struct gpio_driver_config common;
 	sys_slist_t callbacks;
-
-	DEVICE_MMIO_RAM;
 };
 
 static int gpio_sedi_init(const struct device *dev);
@@ -293,7 +289,7 @@ static int gpio_sedi_init(const struct device *dev)
 	const struct gpio_sedi_config *config = dev->config;
 	sedi_gpio_t gpio_dev = config->device;
 
-	DEVICE_MMIO_MAP(dev, K_MEM_CACHE_NONE);
+	sedi_gpio_set_power(gpio_dev, SEDI_POWER_FULL);
 
 	/* Call sedi gpio init */
 	ret = sedi_gpio_init(gpio_dev, gpio_sedi_callback, (void *)dev);
@@ -323,7 +319,6 @@ static int gpio_sedi_init(const struct device *dev)
 		irq_enable(DT_INST_IRQN(n));			       \
 	};							       \
 	static const struct gpio_sedi_config gpio##n##_config = {      \
-		DEVICE_MMIO_ROM_INIT(DT_DRV_INST(n)),                  \
 		.common = { 0xFFFFFFFF },			       \
 		.device = DT_INST_PROP(n, peripheral_id),              \
 		.pin_nums = DT_INST_PROP(n, ngpios),                   \
