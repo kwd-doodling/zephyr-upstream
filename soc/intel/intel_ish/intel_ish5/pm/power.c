@@ -20,8 +20,6 @@ LOG_MODULE_REGISTER(ish_pm, CONFIG_PM_LOG_LEVEL);
 #define FW_D0i2		3
 #define	FW_D0i3		4
 
-extern void sedi_pm_enter_power_state(int state);
-
 void pm_state_set(enum pm_state state, uint8_t substate_id)
 {
 	if (state >= PM_STATE_SUSPEND_TO_RAM) {
